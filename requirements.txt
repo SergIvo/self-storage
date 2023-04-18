@@ -1,0 +1,4 @@
+django==4.2
+environs==9.5.0
+qrcode==7.4.2
+pillow==9.5.0
