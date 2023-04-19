@@ -117,3 +117,31 @@ class Storage(models.Model):
 
     def get_area(self):
         return self.length * self.width
+
+
+class UserStorage(models.Model):
+    number = models.CharField(
+        'Номер хранилища',
+        max_length=100
+    )
+    user = models.ForeignKey(
+        User,
+        verbose_name='Владелец',
+        related_name='storages',
+        on_delete=models.CASCADE
+    )
+    storage = models.ForeignKey(
+        Storage,
+        verbose_name='Тип хранилища',
+        related_name='storages_in_use',
+        on_delete=models.CASCADE
+    )
+    rent_start = models.DateTimeField('Дата начала аренды')
+    rent_end = models.DateTimeField('Дата окончания аренды')
+
+    class Meta:
+        verbose_name = 'Арендованное хранилище'
+        verbose_name_plural = 'Арендованные ранилища'
+
+    def __str__(self):
+        return self.number
