@@ -16,3 +16,8 @@ def get_boxes(request):
 def get_faq(request):
     context = {}
     return render(request, 'faq.html', context)
+
+
+def get_confidential(request):
+    context = {}
+    return render(request, 'confidential.html', context)
