@@ -11,3 +11,8 @@ def index(request):
 def get_boxes(request):
     context = {}
     return render(request, 'boxes.html', context)
+
+
+def get_faq(request):
+    context = {}
+    return render(request, 'faq.html', context)
