@@ -32,6 +32,8 @@ DEBUG = env.bool('DEBUG', False)
 
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', [])
 
+# Custom user model
+AUTH_USER_MODEL = "storage.User"
 
 # Application definition
 
