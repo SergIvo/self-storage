@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 
 from environs import Env
+import dj_database_url
 
 env = Env()
 env.read_env()
@@ -62,10 +63,9 @@ WSGI_APPLICATION = 'self_storage.wsgi.application'
 
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=env.str('DATABASE_URL')
+    )
 }
 
 
