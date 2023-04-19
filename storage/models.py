@@ -85,3 +85,35 @@ class Warehouse(models.Model):
         return self.address
 
 
+class Storage(models.Model):
+    length = models.IntegerField(
+        'Длина',
+        validators=[MinValueValidator(1)]
+    )
+    width = models.IntegerField(
+        'Глубина',
+        validators=[MinValueValidator(1)]
+    )
+    height = models.IntegerField(
+        'Высота',
+        validators=[MinValueValidator(1)]
+    )
+    price = models.IntegerField(
+        'Цена',
+        validators=[MinValueValidator(0)]
+    )
+    warehouses = models.ManyToManyField(
+        Warehouse,
+        related_name='storages',
+        verbose_name='Склады с хранилищами',
+        blank=True)
+
+    class Meta:
+        verbose_name = 'Хранилище'
+        verbose_name_plural = 'Хранилища'
+
+    def __str__(self):
+        return f'{self.length} х {self.width} х {self.height} м'
+
+    def get_area(self):
+        return self.length * self.width
