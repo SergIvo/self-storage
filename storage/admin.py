@@ -52,6 +52,7 @@ class UserChangeForm(forms.ModelForm):
         fields = ["email", "password", "is_active", "is_staff"]
 
 
+@admin.register(User)
 class UserAdmin(BaseUserAdmin):
     # The forms to add and change user instances
     form = UserChangeForm
@@ -87,6 +88,7 @@ class StoragesInline(admin.TabularInline):
     verbose_name_plural = 'Доступные типы хранилищ'
 
 
+@admin.register(Warehouse)
 class WarehouseAdmin(admin.ModelAdmin):
     list_display = ['address']
     list_filter = ['feature', 'temperature', 'ceiling_height']
@@ -94,13 +96,15 @@ class WarehouseAdmin(admin.ModelAdmin):
     inlines = (StoragesInline,)
 
 
+@admin.register(Storage)
 class StorageAdmin(admin.ModelAdmin):
     search_fields = ['length', 'width', 'height']
     list_display = ['get_area']
     list_filter = ['length', 'width', 'height']
     raw_id_field = ('warehouses',)
-    
 
-admin.site.register(User, UserAdmin)
-admin.site.register(Warehouse, WarehouseAdmin)
-admin.site.register(Storage, StorageAdmin)
+
+@admin.register(UserStorage)
+class UserStorageAdmin(admin.ModelAdmin):
+    list_display = ['number', 'user', 'warehouse']
+    raw_id_field = ('user', 'storage', 'warehouse')
