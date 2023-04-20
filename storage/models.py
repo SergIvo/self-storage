@@ -86,17 +86,23 @@ class Warehouse(models.Model):
 
 
 class Storage(models.Model):
-    length = models.IntegerField(
+    length = models.DecimalField(
         'Длина',
-        validators=[MinValueValidator(1)]
+        max_digits=3,
+        decimal_places=1,
+        validators=[MinValueValidator(0)]
     )
-    width = models.IntegerField(
-        'Глубина',
-        validators=[MinValueValidator(1)]
+    width = models.DecimalField(
+        'Ширина',
+        max_digits=3,
+        decimal_places=1,
+        validators=[MinValueValidator(0)]
     )
-    height = models.IntegerField(
+    height = models.DecimalField(
         'Высота',
-        validators=[MinValueValidator(1)]
+        max_digits=2,
+        decimal_places=1,
+        validators=[MinValueValidator(0)]
     )
     price = models.IntegerField(
         'Цена',
