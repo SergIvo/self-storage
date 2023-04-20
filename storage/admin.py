@@ -5,7 +5,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.core.exceptions import ValidationError
 
-from .models import User
+from .models import User, Warehouse, Storage, UserStorage
 # Register your models here.
 
 
@@ -81,5 +81,17 @@ class UserAdmin(BaseUserAdmin):
     filter_horizontal = []
 
 
-# Now register the new UserAdmin...
+class StoragesInline(admin.TabularInline):
+    model = Warehouse.storages.through
+    raw_id_field = ('storages',)
+
+
+class WarehouseAdmin(admin.ModelAdmin):
+    list_display = ['address']
+    list_filter = ['feature', 'temperature', 'ceiling_height']
+    
+    inlines = (StoragesInline,)
+
+
 admin.site.register(User, UserAdmin)
+admin.site.register(Warehouse, WarehouseAdmin)
