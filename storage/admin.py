@@ -5,7 +5,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.core.exceptions import ValidationError
 
-from .models import User
+from .models import User, Warehouse, Storage, UserStorage
 # Register your models here.
 
 
@@ -52,6 +52,7 @@ class UserChangeForm(forms.ModelForm):
         fields = ["email", "password", "is_active", "is_staff"]
 
 
+@admin.register(User)
 class UserAdmin(BaseUserAdmin):
     # The forms to add and change user instances
     form = UserChangeForm
@@ -81,5 +82,29 @@ class UserAdmin(BaseUserAdmin):
     filter_horizontal = []
 
 
-# Now register the new UserAdmin...
-admin.site.register(User, UserAdmin)
+class StoragesInline(admin.TabularInline):
+    model = Warehouse.storages.through
+    raw_id_field = ('storages',)
+    verbose_name_plural = 'Доступные типы хранилищ'
+
+
+@admin.register(Warehouse)
+class WarehouseAdmin(admin.ModelAdmin):
+    list_display = ['address']
+    list_filter = ['feature', 'temperature', 'ceiling_height']
+    
+    inlines = (StoragesInline,)
+
+
+@admin.register(Storage)
+class StorageAdmin(admin.ModelAdmin):
+    search_fields = ['length', 'width', 'height']
+    list_display = ['get_area']
+    list_filter = ['length', 'width', 'height']
+    raw_id_field = ('warehouses',)
+
+
+@admin.register(UserStorage)
+class UserStorageAdmin(admin.ModelAdmin):
+    list_display = ['number', 'user', 'warehouse']
+    raw_id_field = ('user', 'storage', 'warehouse')
