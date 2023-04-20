@@ -136,6 +136,12 @@ class UserStorage(models.Model):
         related_name='storages',
         on_delete=models.CASCADE
     )
+    warehouse = models.ForeignKey(
+        Warehouse,
+        verbose_name='Склад',
+        related_name='storages_in_use',
+        on_delete=models.CASCADE
+    )
     storage = models.ForeignKey(
         Storage,
         verbose_name='Тип хранилища',
