@@ -84,6 +84,7 @@ class UserAdmin(BaseUserAdmin):
 class StoragesInline(admin.TabularInline):
     model = Warehouse.storages.through
     raw_id_field = ('storages',)
+    verbose_name_plural = 'Доступные типы хранилищ'
 
 
 class WarehouseAdmin(admin.ModelAdmin):
@@ -93,5 +94,13 @@ class WarehouseAdmin(admin.ModelAdmin):
     inlines = (StoragesInline,)
 
 
+class StorageAdmin(admin.ModelAdmin):
+    search_fields = ['length', 'width', 'height']
+    list_display = ['get_area']
+    list_filter = ['length', 'width', 'height']
+    raw_id_field = ('warehouses',)
+    
+
 admin.site.register(User, UserAdmin)
 admin.site.register(Warehouse, WarehouseAdmin)
+admin.site.register(Storage, StorageAdmin)
