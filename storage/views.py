@@ -1,10 +1,15 @@
 from django.shortcuts import render
-
-# Create your views here.
+from .forms import RegisterForm
 
 
 def index(request):
-    context = {}
+    form = RegisterForm()
+
+    if request.method == 'Post':
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            form.save()
+    context = {'form': form}
     return render(request, 'index.html', context)
 
 
