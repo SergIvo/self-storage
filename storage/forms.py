@@ -1,17 +1,15 @@
-from django.forms import ModelForm
-from django.contrib.auth.forms import UserCreationForm
 from django import forms
 from .models import User
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 
 
 class RegisterForm(forms.ModelForm):
-    password1 = forms.CharField(label='Пароль', widget=forms.PasswordInput)
+    # password = forms.CharField(label='Пароль', widget=forms.PasswordInput)
     password2 = forms.CharField(label='Подтверждение пароля', widget=forms.PasswordInput)
 
     class Meta:
         model = User
-        fields = ['email', 'phonenumber']
+        fields = ['email', 'phonenumber', 'password', 'password2']
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
@@ -22,15 +20,15 @@ class RegisterForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        password1 = cleaned_data.get("password1")
+        password = cleaned_data.get("password")
         password2 = cleaned_data.get("password2")
-        if password1 is not None and password1 != password2:
+        if password is not None and password != password2:
             self.add_error("password2", "Вы ввели разные пароли")
         return cleaned_data
 
 
 class UserAdminCreationForm(forms.ModelForm):
-    password1 = forms.CharField(widget=forms.PasswordInput)
+    password = forms.CharField(widget=forms.PasswordInput)
     password2 = forms.CharField(label='Confirm Password', widget=forms.PasswordInput)
 
     class Meta:
@@ -39,9 +37,9 @@ class UserAdminCreationForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        password1 = cleaned_data.get("password1")
+        password = cleaned_data.get("password")
         password2 = cleaned_data.get("password2")
-        if password1 is not None and password1 != password2:
+        if password is not None and password != password2:
             self.add_error("password2", "Вы ввели разные пароли")
         return cleaned_data
 
