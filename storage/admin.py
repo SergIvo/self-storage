@@ -9,19 +9,19 @@ from .models import User, Warehouse, Storage, UserStorage
 
 
 class UserCreationForm(forms.ModelForm):
-    password1 = forms.CharField(label="Password", widget=forms.PasswordInput)
+    password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
     password2 = forms.CharField(
-        label="Password confirmation", widget=forms.PasswordInput
+        label='Password confirmation', widget=forms.PasswordInput
     )
 
     class Meta:
         model = User
-        fields = ["email"]
+        fields = ['email']
 
     def clean_password2(self):
         # Check that the two password entries match
-        password1 = self.cleaned_data.get("password1")
-        password2 = self.cleaned_data.get("password2")
+        password1 = self.cleaned_data.get('password1')
+        password2 = self.cleaned_data.get('password2')
         if password1 and password2 and password1 != password2:
             raise ValidationError("Passwords don't match")
         return password2
@@ -29,7 +29,7 @@ class UserCreationForm(forms.ModelForm):
     def save(self, commit=True):
         # Save the provided password in hashed format
         user = super().save(commit=False)
-        user.set_password(self.cleaned_data["password1"])
+        user.set_password(self.cleaned_data['password1'])
         if commit:
             user.save()
         return user
@@ -45,7 +45,7 @@ class UserChangeForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ["email", "password", "is_active", "is_staff"]
+        fields = ['email', 'password', 'name', 'phonenumber', 'is_active', 'is_staff']
 
 
 @admin.register(User)
@@ -57,10 +57,10 @@ class UserAdmin(BaseUserAdmin):
     # The fields to be used in displaying the User model.
     # These override the definitions on the base UserAdmin
     # that reference specific fields on auth.User.
-    list_display = ["email", "is_staff"]
-    list_filter = ["is_staff"]
+    list_display = ['email', 'is_staff']
+    list_filter = ['is_staff']
     fieldsets = [
-        (None, {"fields": ["email", "password"]}),
+        (None, {'fields': ['email', 'password', 'name', 'phonenumber']}),
     ]
     # add_fieldsets is not a standard ModelAdmin attribute. UserAdmin
     # overrides get_fieldsets to use this attribute when creating a user.
@@ -68,13 +68,13 @@ class UserAdmin(BaseUserAdmin):
         (
             None,
             {
-                "classes": ["wide"],
-                "fields": ["email", "password1", "password2"],
+                'classes': ['wide'],
+                'fields': ['email', 'password1', 'password2'],
             },
         ),
     ]
-    search_fields = ["email"]
-    ordering = ["email"]
+    search_fields = ['email']
+    ordering = ['email']
     filter_horizontal = []
 
 
