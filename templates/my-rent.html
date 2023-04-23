@@ -16,16 +16,16 @@
 					<div class="row">
 						<div class="col-12 col-sm-5 d-flex flex-column align-items-center">
 							<img src="{% static 'img/image10.png' %}" class="rounded-pill mb-3" alt="">
-							<h4>Екатерина Иванова</h4>
+							<h4>{{ user.name }}</h4>
 						</div>
 						<div class="col-12 col-sm-7 d-flex flex-column">
 							<form>
 								<label class="fs_24 SelfStorage_green ms-2" for="EMAIL">E-mail</label>
-								<input type="email" name="EMAIL_EDIT" id="EMAIL" class="form-control fs_24 ps-2 SelfStorage__input" value="ekatyusha89@yandex.ru" disabled>
+								<input type="email" name="EMAIL_EDIT" id="EMAIL" class="form-control fs_24 ps-2 SelfStorage__input" value="{{ user.email }}" disabled>
 								<label class="fs_24 SelfStorage_green ms-2" for="PHONE">Телефон</label>
-								<input type="tel" name="PHONE_EDIT" id="PHONE" class="form-control fs_24 ps-2 SelfStorage__input" value="+7-909-000-00-00" disabled>
+								<input type="tel" name="PHONE_EDIT" id="PHONE" class="form-control fs_24 ps-2 SelfStorage__input" value="{{ user.phonenumber }}" disabled>
 								<label class="fs_24 SelfStorage_green ms-2" for="PASSWORD">Пароль</label>
-								<input type="password" name="PASSWORD_EDIT" id="PASSWORD" class="form-control fs_24 ps-2 SelfStorage__input" value="111111111" disabled>
+								<input type="password" name="PASSWORD_EDIT" id="PASSWORD" class="form-control fs_24 ps-2 SelfStorage__input" value="*******" disabled>
 								<button type="submit" class="btn SelfStorage_green ps-1" id="save" style="display: none">Сохранить</button>
 								<a class="btn SelfStorage_orange ps-1" id="edit">Редактировать</a>
 								<script>
@@ -54,32 +54,24 @@
 					</div>
 				</div>
 				<div class="tab-pane fade" id="Rent" role="tabpanel" aria-labelledby="Rent-tab">
-					<h1 class="fw-bold SelfStorage_green mb-5">Добрый день, Екатерина!</h1>
+					<h1 class="fw-bold SelfStorage_green mb-5">Добрый день, {{ user.name }}!</h1>
 					<a href="#" class="SelfStorage_orange">История аренды</a>
-					<h4 class="SelfStorage_grey my-3">Срок Вашей аренды подходит к концу :(<br>Вы можете продлить аренду или забрать вещи до 28 июня 2022 года включительно.</h4>
+					{% for storage in storages %}
+					    {% if storage.expiring %}
+					    <h4 class="SelfStorage_grey my-3">Срок Вашей аренды подходит к концу :(<br>Вы можете продлить аренду или забрать вещи до 28 июня 2022 года включительно.</h4>
+					    {% endif %}
 					<div class="mb-5">
 						<h4 class="SelfStorage_green">Мой склад №1</h4>
-						<h4>Одинцово, ул. Северная, д. 36</h4>
+						<h4>{{ storage.address }}</h4>
 						<h4 class="SelfStorage_green">Мой бокс</h4>
-						<h4>№2389-12</h4>
+						<h4>{{ storage.number }}</h4>
 						<h4 class="SelfStorage_green">Срок аренды</h4>
-						<h4>15.03.2022 - 28.06.2022</h4>
+						<h4>{{ storage.rent_start }} - {{ storage.rent_end }}</h4>
 						<div><button class="btn fs_24 px-5 py-3 text-white border-8 SelfStorage__bg_green SelfStorage__btn2_green mb-3">Продлить аренду</button></div>
 						<div><button class="btn fs_24 px-5 py-3 text-white border-8 SelfStorage__bg_orange SelfStorage__btn2_orange mb-3">Открыть бокс</button></div>
 						<a href="#" class="SelfStorage_orange">Нужна помощь?</a>
 					</div>
-
-					<div class="mb-5">
-						<h4 class="SelfStorage_green">Мой склад №2</h4>
-						<h4>Люберцы, ул. Советская, д. 88</h4>
-						<h4 class="SelfStorage_green">Мой бокс</h4>
-						<h4>№2335-10</h4>
-						<h4 class="SelfStorage_green">Срок аренды</h4>
-						<h4>18.03.2022 - 21.09.2022</h4>
-						<div><button class="btn fs_24 px-5 py-3 text-white border-8 SelfStorage__bg_green SelfStorage__btn2_green mb-3">Продлить аренду</button></div>
-						<div><button class="btn fs_24 px-5 py-3 text-white border-8 SelfStorage__bg_orange SelfStorage__btn2_orange mb-3">Открыть бокс</button></div>
-						<a href="#" class="SelfStorage_orange">Нужна помощь?</a>
-					</div>
+                    {% endfor %}
 				</div>
 			</div>
 		</div>
