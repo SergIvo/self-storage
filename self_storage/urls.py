@@ -12,6 +12,9 @@ urlpatterns = [
     path('faq/', views.get_faq, name='faq'),
     path('confidential/', views.get_confidential, name='confidential'),
     path('account/', views.get_account, name='account'),
+    path('logout/', views.logout_user, name="logout"),
+    path('login/', views.login_user, name="login"),
+    path('register/', views.register_user, name="register_user"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:
