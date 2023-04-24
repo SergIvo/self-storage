@@ -36,7 +36,8 @@ def index(request):
     )
     context = {
         'form': form,
-        'warehouse': sample_warehouse
+        'warehouse': sample_warehouse,
+        'user_authorised': request.user.is_authenticated
     }
     return render(request, 'index.html', context)
 
@@ -49,17 +50,20 @@ def get_boxes(request):
     for warehouse in warehouses:
         warehouse.storages_list = list(warehouse.storages.all())
     
-    context = {'warehouses': warehouses}
+    context = {
+        'warehouses': warehouses,
+        'user_authorised': request.user.is_authenticated
+    }
     return render(request, 'boxes.html', context)
 
 
 def get_faq(request):
-    context = {}
+    context = {'user_authorised': request.user.is_authenticated}
     return render(request, 'faq.html', context)
 
 
 def get_confidential(request):
-    context = {}
+    context = {'user_authorised': request.user.is_authenticated}
     return render(request, 'confidential.html', context)
 
 
@@ -109,5 +113,7 @@ def get_account(request):
     user_storages = UserStorage.objects.filter(user=user).annotate(address=F('warehouse__address'))
     context = {
         'user': request.user,
-        'storages': user_storages}
+        'storages': user_storages,
+        'user_authorised': request.user.is_authenticated
+    }
     return render(request, 'my-rent.html', context)
