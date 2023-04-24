@@ -15,6 +15,8 @@ urlpatterns = [
     path('logout/', views.logout_user, name="logout"),
     path('login/', views.login_user, name="login"),
     path('register/', views.register_user, name="register_user"),
+
+    path('payment/', include(('payment.urls', 'payment'), namespace='payment')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:

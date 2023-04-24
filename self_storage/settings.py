@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'storage',
+    'payment',
     'debug_toolbar',
 ]
 
@@ -109,3 +110,7 @@ INTERNAL_IPS = [
 ]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+STRIPE_PUBLIC_KEY = env('PUBLISH_KEY_STRIPE')
+STRIPE_SECRET_KEY = env('SECRET_KEY_STRIPE')
+STRIPE_WEBHOOK_KEY = env('WEBHOOK_KEY_STRIPE')
