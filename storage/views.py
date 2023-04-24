@@ -71,9 +71,7 @@ def logout_user(request):
 def login_user(request):
     if request.method == 'POST':
 
-        print(request.POST)
         email = request.POST.get('EMAIL')
-
         password = request.POST.get('PASSWORD')
 
         user = authenticate(request, email=email, password=password)
