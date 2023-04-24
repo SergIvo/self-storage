@@ -49,6 +49,15 @@ def get_boxes(request):
     )
     for warehouse in warehouses:
         warehouse.storages_list = list(warehouse.storages.all())
+        warehouse.storages_lt_three = list(
+            warehouse.storages.with_area().filter(area__lt=3)
+        )
+        warehouse.storages_lt_ten = list(
+            warehouse.storages.with_area().filter(area__lt=10)
+        )
+        warehouse.storages_gt_ten = list(
+            warehouse.storages.with_area().filter(area__gte=10)
+        )
     
     context = {
         'warehouses': warehouses,

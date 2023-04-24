@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.core.validators import MinValueValidator
+from django.db.models import F
 
 from phonenumber_field.modelfields import PhoneNumberField
 
@@ -84,6 +85,11 @@ class Warehouse(models.Model):
         return self.address
 
 
+class StorageManager(models.Manager):
+    def with_area(self):
+        return self.annotate(area=F('length') * F('width'))
+
+
 class Storage(models.Model):
     length = models.DecimalField(
         'Длина',
@@ -112,6 +118,8 @@ class Storage(models.Model):
         related_name='storages',
         verbose_name='Склады с хранилищами',
         blank=True)
+
+    objects = StorageManager()
 
     class Meta:
         verbose_name = 'Хранилище'
