@@ -118,3 +118,9 @@ def get_account(request):
         'user_authorised': request.user.is_authenticated
     }
     return render(request, 'my-rent.html', context)
+
+
+@login_required(login_url='index')
+def make_order(request, warehouse_id, storage_id):
+    print(warehouse_id, storage_id)
+    return redirect('index')
