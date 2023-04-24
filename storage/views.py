@@ -5,7 +5,7 @@ from .forms import RegisterForm
 from .models import User, Warehouse, Storage, UserStorage
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.decorators import login_required
-from django.db.models import Count, F, Min
+from django.db.models import F
 from django.contrib.auth import logout, login, authenticate
 
 
@@ -29,10 +29,7 @@ def index(request):
                 return redirect('account')
     
     sample_warehouse = choice(
-        Warehouse.objects.annotate(
-            free_storages=F('total_storages') - Count('storages_in_use'),
-            min_price=Min('storages__price')
-        )
+        Warehouse.objects.with_annotations()
     )
     context = {
         'form': form,
@@ -43,10 +40,7 @@ def index(request):
 
 
 def get_boxes(request):
-    warehouses = Warehouse.objects.prefetch_related('storages').annotate(
-        free_storages=F('total_storages') - Count('storages_in_use'), 
-        min_price=Min('storages__price')
-    )
+    warehouses = Warehouse.objects.with_annotations()
     for warehouse in warehouses:
         warehouse.storages_list = list(warehouse.storages.all())
         warehouse.storages_lt_three = list(
@@ -92,7 +86,7 @@ def login_user(request):
         if user is not None:
             login(request, user)
             return redirect('account')
-    context = {}
+    context = {'user_authorised': request.user.is_authenticated}
     return render(request, 'login.html', context)
 
 

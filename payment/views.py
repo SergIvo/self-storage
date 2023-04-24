@@ -5,17 +5,13 @@ from django.http import HttpResponse
 from storage.models import Warehouse
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, redirect
-from django.db.models import Count, F, Min
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
 def create_checkout_session(request, pk):
     YOUR_DOMAIN = 'http://127.0.0.1:8000'
-    warehouse = Warehouse.objects.prefetch_related('storages').annotate(
-        free_storages=F('total_storages') - Count('storages_in_use'),
-        min_price=Min('storages__price')
-    ).get(id=pk)
+    warehouse = Warehouse.objects.with_annotations().get(id=pk)
     # warehouse = warehouses.objects.get(id=pk)
     checkout_session = stripe.checkout.Session.create(
         payment_method_types=['card'],
