@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.urls import path, include
 
 from storage import views
+from payment.views import stripe_webhook
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -18,6 +19,7 @@ urlpatterns = [
     path('order/<int:warehouse_id>/<int:storage_id>', views.make_order, name='make_order'),
 
     path('payment/', include(('payment.urls', 'payment'), namespace='payment')),
+    path('webhooks/stripe/', stripe_webhook, name='stripe-webhook'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:
