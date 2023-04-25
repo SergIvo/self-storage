@@ -1,5 +1,6 @@
 import stripe
-from django.core.mail import send_mail
+import smtplib
+from email.message import EmailMessage
 from django.conf import settings
 from django.http import HttpResponse
 from storage.models import Warehouse
@@ -63,16 +64,7 @@ def stripe_webhook(request):
         customer_email = session['customer_details']['email']
         order_id = session['metadata']['product_id']
 
-        # order = Order.objects.get(id=order_id)
-        # order.paid = True
-        # order.save()
-
-        send_mail(
-            subject='Ваш заказ оплачен',
-            message=f'Спасибо! Ваш заказ {order_id} оплачен!',
-            recipient_list=[customer_email],
-            from_email='test@test.com',
-        )
+        send_email(customer_email)
 
     return HttpResponse(status=200)
 
@@ -83,3 +75,17 @@ def success_payment(request):
 
 def cansel_payment(request):
     return render(request, 'payment/cansel.html')
+
+
+def send_email(customer_email):
+    msg = EmailMessage()
+    msg["From"] = settings.EMAIL_HOST_USER
+    msg["Subject"] = "Спасибо за заказ в SelfStorage!"
+    msg["To"] = customer_email
+    msg.set_content("QR код от ячейки находится во вложении!")
+    msg.add_attachment(open("payment/text.txt", "r").read(), filename="text.txt")
+
+    server = smtplib.SMTP_SSL(settings.EMAIL_HOST)
+    server.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD)
+    server.send_message(msg)
+    server.quit()
