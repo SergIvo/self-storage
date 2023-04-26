@@ -5,7 +5,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.core.exceptions import ValidationError
 
-from .models import User, Warehouse, Storage, UserStorage
+from .models import User, Warehouse, StorageType, Storage, UserStorage
 
 
 class UserCreationForm(forms.ModelForm):
@@ -79,7 +79,7 @@ class UserAdmin(BaseUserAdmin):
 
 
 class StoragesInline(admin.TabularInline):
-    model = Warehouse.storages.through
+    model = Storage
     raw_id_field = ('storages',)
     verbose_name_plural = 'Доступные типы хранилищ'
 
@@ -92,15 +92,21 @@ class WarehouseAdmin(admin.ModelAdmin):
     inlines = (StoragesInline,)
 
 
-@admin.register(Storage)
-class StorageAdmin(admin.ModelAdmin):
+@admin.register(StorageType)
+class StorageTypeAdmin(admin.ModelAdmin):
     search_fields = ['length', 'width', 'height']
     list_display = ['get_area']
     list_filter = ['length', 'width', 'height']
-    raw_id_field = ('warehouses',)
+    raw_id_field = ('storages',)
+
+
+@admin.register(Storage)
+class StorageAdmin(admin.ModelAdmin):
+    list_display = ['floor', 'number', 'warehouse']
+    list_filter = ['floor', 'warehouse']
 
 
 @admin.register(UserStorage)
 class UserStorageAdmin(admin.ModelAdmin):
-    list_display = ['number', 'user', 'warehouse']
-    raw_id_field = ('user', 'storage', 'warehouse')
+    list_display = ['user', 'storage']
+    raw_id_field = ('user', 'storage')
