@@ -3,16 +3,19 @@ import smtplib
 from email.message import EmailMessage
 from django.conf import settings
 from django.http import HttpResponse
-from storage.models import Warehouse
+from storage.models import Warehouse, UserStorage
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, redirect
+
+from .qr_code import make_qr
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
 def create_checkout_session(request, pk):
     YOUR_DOMAIN = 'http://127.0.0.1:8000'
-    warehouse = Warehouse.objects.with_annotations().get(id=pk)
+    rented_storage = UserStorage.objects.get(id=pk)
+    storage_price = rented_storage.storage.storage_type.price
     # warehouse = warehouses.objects.get(id=pk)
     checkout_session = stripe.checkout.Session.create(
         payment_method_types=['card'],
@@ -20,16 +23,16 @@ def create_checkout_session(request, pk):
             {
                 'price_data': {
                     'currency': 'rub',
-                    'unit_amount_decimal': (warehouse.min_price * 100),
+                    'unit_amount_decimal': (storage_price * 100),
                     'product_data': {
-                        'name': f'Номер заказа {warehouse.id}'
+                        'name': f'Номер заказа {rented_storage.id}'
                     }
                 },
                 'quantity': 1,
             },
         ],
         metadata={
-          'product_id': warehouse.id
+          'product_id': rented_storage.id
         },
         mode='payment',
         success_url=YOUR_DOMAIN + '/payment/success',
@@ -64,6 +67,19 @@ def stripe_webhook(request):
         customer_email = session['customer_details']['email']
         order_id = session['metadata']['product_id']
 
+        rented_storage = UserStorage.objects.get(id=order_id)
+        rented_storage.paid = True
+        rented_storage.save()
+
+        make_qr(
+            {
+                'owner': rented_storage.user.email,
+                'storage': rented_storage.storage.number.replace('№', '#'),
+                'expires_at': rented_storage.rent_end.isoformat()
+            },
+            'payment/qr.png'
+        )
+
         send_email(customer_email)
 
     return HttpResponse(status=200)
@@ -83,7 +99,7 @@ def send_email(customer_email):
     msg["Subject"] = "Спасибо за заказ в SelfStorage!"
     msg["To"] = customer_email
     msg.set_content("QR код от ячейки находится во вложении!")
-    msg.add_attachment(open("payment/text.txt", "r").read(), filename="text.txt")
+    msg.add_attachment(open("payment/qr.png", "r").read(), filename="qr.png")
 
     server = smtplib.SMTP_SSL(settings.EMAIL_HOST)
     server.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD)
