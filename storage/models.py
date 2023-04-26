@@ -79,11 +79,6 @@ class Warehouse(models.Model):
         decimal_places=1,
         validators=[MinValueValidator(1)]
     )
-    total_storages = models.IntegerField(
-        'Всего хранилищ',
-        blank=True,
-        validators=[MinValueValidator(1)]
-    )
 
     objects = WarehouseManager()
 
@@ -92,15 +87,10 @@ class Warehouse(models.Model):
         verbose_name_plural = 'Склады'
 
     def __str__(self):
-        return self.address
+        return f'{self.city}, {self.address}'
 
 
-class StorageManager(models.Manager):
-    def with_area(self):
-        return self.annotate(area=F('length') * F('width'))
-
-
-class Storage(models.Model):
+class StorageType(models.Model):
     length = models.DecimalField(
         'Длина',
         max_digits=3,
@@ -123,17 +113,10 @@ class Storage(models.Model):
         'Цена',
         validators=[MinValueValidator(0)]
     )
-    warehouses = models.ManyToManyField(
-        Warehouse,
-        related_name='storages',
-        verbose_name='Склады с хранилищами',
-        blank=True)
-
-    objects = StorageManager()
 
     class Meta:
-        verbose_name = 'Хранилище'
-        verbose_name_plural = 'Хранилища'
+        verbose_name = 'Тип хранилища'
+        verbose_name_plural = 'Типы хранилищ'
 
     def __str__(self):
         return f'{self.length} х {self.width} х {self.height} м'
@@ -142,35 +125,84 @@ class Storage(models.Model):
         return self.length * self.width
 
 
-class UserStorage(models.Model):
+class StorageManager(models.Manager):
+    def with_characteristics(self):
+        return self.prefetch_related('storage_type').annotate(
+            area=F('storage_type__length') * F('storage_type__width'),
+            size=Concat(
+                F('storage_type__length'),
+                Value(' x '),
+                F('storage_type__width'),
+                Value(' x '),
+                F('storage_type__height'),
+                output_field=CharField()
+            ),
+            price=F('storage_type__price')
+        )
+
+
+class Storage(models.Model):
+    floor = models.IntegerField(
+        'Этаж',
+        validators=[MinValueValidator(1)]
+    )
     number = models.CharField(
         'Номер хранилища',
         max_length=100
     )
+    warehouse = models.ForeignKey(
+        Warehouse,
+        on_delete=models.CASCADE,
+        related_name='storages',
+        verbose_name='Склад',
+    )
+    storage_type = models.ForeignKey(
+        StorageType,
+        on_delete=models.CASCADE,
+        related_name='storages',
+        verbose_name='Тип хранилища',
+    )
+
+    objects = StorageManager()
+
+    class Meta:
+        verbose_name = 'Хранилище'
+        verbose_name_plural = 'Хранилища'
+
+    def __str__(self):
+        return self.number
+
+
+class UserStorage(models.Model):
     user = models.ForeignKey(
         User,
         verbose_name='Владелец',
         related_name='storages',
         on_delete=models.CASCADE
     )
-    warehouse = models.ForeignKey(
-        Warehouse,
-        verbose_name='Склад',
-        related_name='storages_in_use',
-        on_delete=models.CASCADE
-    )
-    storage = models.ForeignKey(
+    storage = models.OneToOneField(
         Storage,
-        verbose_name='Тип хранилища',
-        related_name='storages_in_use',
+        verbose_name='Хранилище',
+        related_name='rented_storage',
         on_delete=models.CASCADE
     )
     rent_start = models.DateTimeField('Дата начала аренды')
     rent_end = models.DateTimeField('Дата окончания аренды')
+    paid = models.BooleanField('Оплачено', default=False)
 
     class Meta:
         verbose_name = 'Арендованное хранилище'
-        verbose_name_plural = 'Арендованные ранилища'
+        verbose_name_plural = 'Арендованные хранилища'
 
     def __str__(self):
-        return self.number
+        return f'{self.user} {self.storage}'
+
+
+def storages_with_address(user_storages):
+    return user_storages.prefetch_related('storage').annotate(
+        address=Concat(
+            F('storage__warehouse__city'), 
+            Value(', '), 
+            F('storage__warehouse__address')
+        )
+    )
