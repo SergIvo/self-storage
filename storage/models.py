@@ -1,7 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.core.validators import MinValueValidator
-from django.db.models import Count, F, Min
+from django.db.models.functions import Concat
+from django.db.models import Count, F, Min, Value, Subquery, OuterRef, CharField
 
 from phonenumber_field.modelfields import PhoneNumberField
 
@@ -43,13 +44,17 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class WarehouseManager(models.Manager):
     def with_annotations(self):
-        return self.prefetch_related('storages').annotate(
-            free_storages=F('total_storages') - Count('storages_in_use'),
-            min_price=Min('storages__price')
+        return self.prefetch_related('storages__storage_type').annotate(
+            total_storages=Count('storages'),
+            min_price=Min('storages__storage_type__price')
         )
 
 
 class Warehouse(models.Model):
+    city = models.CharField(
+        'Город',
+        max_length=100
+    )
     address = models.CharField(
         'Адрес',
         max_length=100

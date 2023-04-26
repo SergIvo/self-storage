@@ -94,7 +94,7 @@
 						<img src="{% static 'img/image11.png' %}" alt="" class="mb-3 mb-lg-0">
 					</div>
 					<div class="col-12 col-md-4 col-lg-3 d-flex flex-column justify-content-center">
-						<h4 class="text-center">Город</h4>
+						<h4 class="text-center">{{ warehouse.city }}</h4>
 						<h6 class="text-center">{{ warehouse.address }}</h6>
 					</div>
 					<div class="col-12 col-md-4 col-lg-3 d-flex flex-column justify-content-center">
@@ -127,7 +127,7 @@
 		<div class="tab-content" id="boxes-content">
 		    {% for warehouse in warehouses %}
 			<div class="tab-pane fade pills-warehouse-{{ warehouse.id }}" id="0" role="tabpanel" aria-labelledby="pills-warehouse-{{ warehouse.id }}-tab">
-				<h1 class="text-center mb-4 fw-bold">{{ warehouse.address }}</h1>
+				<h1 class="text-center mb-4 fw-bold">{{ warehouse.city }}, {{ warehouse.address }}</h1>
 				<div class="row d-flex flex-column mb-5">
 					<div class="col-12 col-sm-6 col-lg-4 d-flex justify-content-between align-self-center">
 						<a type="button" class="SelfStorage_orange" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="bottom" title="Контакты" data-bs-content="{{ warehouse.contact_phone }}">
@@ -234,16 +234,16 @@
 			<div class="tab-pane fade show active" id="pills-all" role="tabpanel" aria-labelledby="pills-home-tab">
 				{% for warehouse in warehouses %}
 				    <div class="collapse storages-block storages-warehouse-{{ warehouse.id }}">
-				    {% for storage in warehouse.storages_list %}
-				    <a href="{% url 'make_order' warehouse.id storage.id %}" class="row text-decoration-none py-3 px-4 mt-5 SelfStorage__boxlink ">
+				    {% for storage in warehouse.all_storages %}
+				    <a href="{% url 'make_order' storage.id %}" class="row text-decoration-none py-3 px-4 mt-5 SelfStorage__boxlink ">
 					    <div class="col-12 col-md-4 col-lg-3 d-flex justify-content-center align-items-center">
 						    <span class="SelfStorage_green fs_24 me-2">1 эт.</span><span class="fs_24">{{ storage.number }}</span>
 					    </div>
 					    <div class="col-6 col-md-4 col-lg-3 d-flex justify-content-center align-items-center">
-						    <span class="fs_24">{{ storage.get_area }} м²</span>
+						    <span class="fs_24">{{ storage.area }} м²</span>
 					    </div>
 					    <div class="col-6 col-md-4 col-lg-3 d-flex justify-content-center align-items-center">
-						    <span class="fs_24">{{ storage.length }} х {{ storage.width }} х {{ storage.height }} м</span>
+						    <span class="fs_24">{{ storage.size }} м</span>
 					    </div>
 					    <div class="col-12 col-lg-3">
 						    <span class="btn my-2 w-100 text-white fs_24 SelfStorage__bg_orange SelfStorage__btn2_orange border-8">От {{ storage.price }} ₽</span>
@@ -266,15 +266,15 @@
 				{% for warehouse in warehouses %}
 				    <div class="collapse storages-block storages-warehouse-{{ warehouse.id }}">
 				    {% for storage in warehouse.storages_lt_three %}
-				    <a href="{% url 'make_order' warehouse.id storage.id %}" class="row text-decoration-none py-3 px-4 mt-5 SelfStorage__boxlink ">
+				    <a href="{% url 'make_order' storage.id %}" class="row text-decoration-none py-3 px-4 mt-5 SelfStorage__boxlink ">
 					    <div class="col-12 col-md-4 col-lg-3 d-flex justify-content-center align-items-center">
 						    <span class="SelfStorage_green fs_24 me-2">1 эт.</span><span class="fs_24">{{ storage.number }}</span>
 					    </div>
 					    <div class="col-6 col-md-4 col-lg-3 d-flex justify-content-center align-items-center">
-						    <span class="fs_24">{{ storage.get_area }} м²</span>
+						    <span class="fs_24">{{ storage.area }} м²</span>
 					    </div>
 					    <div class="col-6 col-md-4 col-lg-3 d-flex justify-content-center align-items-center">
-						    <span class="fs_24">{{ storage.length }} х {{ storage.width }} х {{ storage.height }} м</span>
+						    <span class="fs_24">{{ storage.size }} м</span>
 					    </div>
 					    <div class="col-12 col-lg-3">
 						    <span class="btn my-2 w-100 text-white fs_24 SelfStorage__bg_orange SelfStorage__btn2_orange border-8">От {{ storage.price }} ₽</span>
@@ -288,15 +288,15 @@
 				{% for warehouse in warehouses %}
 				    <div class="collapse storages-block storages-warehouse-{{ warehouse.id }}">
 				    {% for storage in warehouse.storages_lt_ten %}
-				    <a href="{% url 'make_order' warehouse.id storage.id %}" class="row text-decoration-none py-3 px-4 mt-5 SelfStorage__boxlink ">
+				    <a href="{% url 'make_order' storage.id %}" class="row text-decoration-none py-3 px-4 mt-5 SelfStorage__boxlink ">
 					    <div class="col-12 col-md-4 col-lg-3 d-flex justify-content-center align-items-center">
 						    <span class="SelfStorage_green fs_24 me-2">1 эт.</span><span class="fs_24">{{ storage.number }}</span>
 					    </div>
 					    <div class="col-6 col-md-4 col-lg-3 d-flex justify-content-center align-items-center">
-						    <span class="fs_24">{{ storage.get_area }} м²</span>
+						    <span class="fs_24">{{ storage.area }} м²</span>
 					    </div>
 					    <div class="col-6 col-md-4 col-lg-3 d-flex justify-content-center align-items-center">
-						    <span class="fs_24">{{ storage.length }} х {{ storage.width }} х {{ storage.height }} м</span>
+						    <span class="fs_24">{{ storage.size }} м</span>
 					    </div>
 					    <div class="col-12 col-lg-3">
 						    <span class="btn my-2 w-100 text-white fs_24 SelfStorage__bg_orange SelfStorage__btn2_orange border-8">От {{ storage.price }} ₽</span>
@@ -316,15 +316,15 @@
 				{% for warehouse in warehouses %}
 				    <div class="collapse storages-block storages-warehouse-{{ warehouse.id }}">
 				    {% for storage in warehouse.storages_gt_ten %}
-				    <a href="{% url 'make_order' warehouse.id storage.id %}" class="row text-decoration-none py-3 px-4 mt-5 SelfStorage__boxlink ">
+				    <a href="{% url 'make_order' storage.id %}" class="row text-decoration-none py-3 px-4 mt-5 SelfStorage__boxlink ">
 					    <div class="col-12 col-md-4 col-lg-3 d-flex justify-content-center align-items-center">
 						    <span class="SelfStorage_green fs_24 me-2">1 эт.</span><span class="fs_24">{{ storage.number }}</span>
 					    </div>
 					    <div class="col-6 col-md-4 col-lg-3 d-flex justify-content-center align-items-center">
-						    <span class="fs_24">{{ storage.get_area }} м²</span>
+						    <span class="fs_24">{{ storage.area }} м²</span>
 					    </div>
 					    <div class="col-6 col-md-4 col-lg-3 d-flex justify-content-center align-items-center">
-						    <span class="fs_24">{{ storage.length }} х {{ storage.width }} х {{ storage.height }} м</span>
+						    <span class="fs_24">{{ storage.size }} м</span>
 					    </div>
 					    <div class="col-12 col-lg-3">
 						    <span class="btn my-2 w-100 text-white fs_24 SelfStorage__bg_orange SelfStorage__btn2_orange border-8">От {{ storage.price }} ₽</span>

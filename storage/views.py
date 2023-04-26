@@ -2,11 +2,12 @@ from random import choice
 
 from django.shortcuts import render, redirect
 from .forms import RegisterForm
-from .models import User, Warehouse, Storage, UserStorage
+from .models import User, Warehouse, Storage, UserStorage, storages_with_address
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.decorators import login_required
 from django.db.models import F
 from django.contrib.auth import logout, login, authenticate
+from django.utils import timezone
 
 
 def index(request):
@@ -42,16 +43,33 @@ def index(request):
 def get_boxes(request):
     warehouses = Warehouse.objects.with_annotations()
     for warehouse in warehouses:
-        warehouse.storages_list = list(warehouse.storages.all())
-        warehouse.storages_lt_three = list(
-            warehouse.storages.with_area().filter(area__lt=3)
+        warehouse_storages = list(
+            Storage.objects.with_characteristics().filter(
+                warehouse=warehouse,
+                rented_storage=None
+            )
         )
-        warehouse.storages_lt_ten = list(
-            warehouse.storages.with_area().filter(area__lt=10)
+        warehouse.free_storages = len(warehouse_storages)
+        storages_types = list(
+            {storage.storage_type for storage in warehouse_storages}
         )
-        warehouse.storages_gt_ten = list(
-            warehouse.storages.with_area().filter(area__gte=10)
-        )
+
+        warehouse.all_storages = []
+        for storage_type in storages_types:
+            filtered = [
+                storage for storage in warehouse_storages if storage.storage_type == storage_type
+            ]
+            warehouse.all_storages.append(filtered[0])
+
+        warehouse.storages_lt_three = [
+            storage for storage in warehouse.all_storages if storage.area < 3
+        ]
+        warehouse.storages_lt_ten = [
+            storage for storage in warehouse.all_storages if storage.area < 10
+        ]
+        warehouse.storages_gt_ten = [
+            storage for storage in warehouse.all_storages if storage.area >= 10
+        ]
     
     context = {
         'warehouses': warehouses,
@@ -111,7 +129,7 @@ def register_user(request):
 @login_required(login_url='index')
 def get_account(request):
     user = request.user
-    user_storages = UserStorage.objects.filter(user=user).annotate(address=F('warehouse__address'))
+    user_storages = storages_with_address(user.storages)
     context = {
         'user': request.user,
         'storages': user_storages,
@@ -121,6 +139,14 @@ def get_account(request):
 
 
 @login_required(login_url='index')
-def make_order(request, warehouse_id, storage_id):
-    print(warehouse_id, storage_id)
-    return redirect('index')
+def make_order(request, storage_id):
+    storage = Storage.objects.get(id=storage_id)
+    start_datetime = rent_start=timezone.now()
+    end_datetime = start_datetime.replace(month=start_datetime.month+1)
+    rented_storage = UserStorage.objects.create(
+        user=request.user,
+        storage=storage,
+        rent_start=start_datetime,
+        rent_end=end_datetime
+    )
+    return redirect('payment:create_checkout_session', rented_storage.id)
