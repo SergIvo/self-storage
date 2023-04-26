@@ -8,15 +8,16 @@ from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, redirect
 
 from .qr_code import make_qr
+from django.contrib.auth.decorators import login_required
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
+@login_required(login_url='index')
 def create_checkout_session(request, pk):
     YOUR_DOMAIN = 'http://127.0.0.1:8000'
     rented_storage = UserStorage.objects.get(id=pk)
     storage_price = rented_storage.storage.storage_type.price
-    # warehouse = warehouses.objects.get(id=pk)
     checkout_session = stripe.checkout.Session.create(
         payment_method_types=['card'],
         line_items=[
@@ -86,7 +87,8 @@ def stripe_webhook(request):
 
 
 def success_payment(request):
-    return render(request, 'payment/success.html')
+    context = {'user_authorised': request.user.is_authenticated}
+    return render(request, 'payment/success.html', context)
 
 
 def cansel_payment(request):
@@ -99,7 +101,7 @@ def send_email(customer_email):
     msg["Subject"] = "Спасибо за заказ в SelfStorage!"
     msg["To"] = customer_email
     msg.set_content("QR код от ячейки находится во вложении!")
-    msg.add_attachment(open("payment/qr.png", "r").read(), filename="qr.png")
+    msg.add_attachment(open("payment/qr.png", "rb").read(), maintype='image', subtype='png', filename="qr.png")
 
     server = smtplib.SMTP_SSL(settings.EMAIL_HOST)
     server.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD)

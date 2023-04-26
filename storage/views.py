@@ -5,7 +5,6 @@ from .forms import RegisterForm
 from .models import User, Warehouse, Storage, UserStorage, storages_with_address
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.decorators import login_required
-from django.db.models import F
 from django.contrib.auth import logout, login, authenticate
 from django.utils import timezone
 

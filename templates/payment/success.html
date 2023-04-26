@@ -1,18 +1,16 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Спасибо за ваш заказ!</title>
-  <link rel="stylesheet" href="Style.css">
-</head>
-<body>
-  <section>
-    <p>
-      Мы ценим наше сотрудничество! Если есть вопросы напишите нам на почту!
-      <a href="mailto:info@selfstorage.ru">info@selfstorage.ru</a>.
-    </p>
-    <p>
-      <a href="{% url 'index' %}" class="button light">Заказать новый склад</a>
-    </p>
-  </section>
-</body>
-</html>
+{% extends 'base.html' %}
+{% block title %}Success{% endblock %}
+{% block content %}
+  {% load static %}
+  <article class="text-center row pt-header">
+		<h1 class=" fw-bold SelfStorage_green mb-5">Спасибо за ваш заказ!</h1>
+        <p>
+          Мы ценим наше сотрудничество! Если есть вопросы напишите нам на почту!
+          <a href="mailto:info@selfstorage.ru">info@selfstorage.ru</a>.
+        </p>
+        <p>
+          <a href="{% url 'index' %}" class="button light">Заказать новый склад</a>
+        </p>
+  </article>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+{% endblock %}
