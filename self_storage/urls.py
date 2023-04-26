@@ -16,7 +16,7 @@ urlpatterns = [
     path('logout/', views.logout_user, name="logout"),
     path('login/', views.login_user, name="login"),
     path('register/', views.register_user, name="register_user"),
-    path('order/<int:warehouse_id>/<int:storage_id>', views.make_order, name='make_order'),
+    path('order/<int:storage_id>', views.make_order, name='make_order'),
 
     path('payment/', include(('payment.urls', 'payment'), namespace='payment')),
     path('webhooks/stripe/', stripe_webhook, name='stripe-webhook'),
