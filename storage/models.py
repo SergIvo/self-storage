@@ -160,12 +160,14 @@ class Storage(models.Model):
         on_delete=models.CASCADE,
         related_name='storages',
         verbose_name='Склад',
+        null=True
     )
     storage_type = models.ForeignKey(
         StorageType,
         on_delete=models.CASCADE,
         related_name='storages',
         verbose_name='Тип хранилища',
+        null=True
     )
 
     objects = StorageManager()
