@@ -129,7 +129,12 @@ def register_user(request):
 @login_required(login_url='index')
 def get_account(request):
     user = request.user
-    user_storages = storages_with_address(user.storages)
+    user_storages = storages_with_address(user.storages.filter(paid=True))
+    for storage in user_storages:
+        expiration_date = storage.rent_end.date()
+        delta = expiration_date - timezone.now().date()
+        if delta.days <= 3:
+            storage.expiring = True
     context = {
         'user': request.user,
         'storages': user_storages,
